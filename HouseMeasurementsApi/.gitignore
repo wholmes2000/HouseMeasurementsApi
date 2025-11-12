@@ -1,0 +1,111 @@
+# .NET build output
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+.history/
+*.code-workspace
+
+# Visual Studio
+.vs/
+TestResult*/
+[Tt]est[Rr]esult*/
+*.VisualState.xml
+*.pidb
+*.svclog
+*.scc
+
+# Build results
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.log
+*.vspscc
+*.vssscc
+*.cachefile
+*.dbmdl
+*.bak
+*.Backup
+*.BLOB
+*.tmp_proj
+*.tmp
+*.db
+
+# Rider
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+project.lock.json
+artifacts/
+packages/
+.nuget/
+
+# Publish outputs
+publish/
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_Packages/
+_PublishTemp/
+
+# Azure
+.local.settings.json
+/secrets/
+*.PublishSettings
+*.azurePubxml
+
+# Logs
+*.log
+*.tlog
+*.svclog
+*.etl
+*.err
+*.wrn
+
+# Configuration files that may contain secrets
+appsettings.Development.json
+appsettings.Local.json
+
+# Transient files
+*.tmp
+*.bak
+*.swp
+*~
+*.orig
+
+# Python virtual environments (if using Azure Functions w/ Python)
+.venv/
+env/
+ENV/
+
+# Node (if mixed frontend/backend repo)
+node_modules/
+dist/
+npm-debug.log*
+
+# JetBrains Rider specific
+.idea/
+*.DotSettings.user
