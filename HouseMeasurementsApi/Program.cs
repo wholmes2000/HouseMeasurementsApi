@@ -1,12 +1,15 @@
 using Carter;
 using HouseMeasurementsApi.Config;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Load configuration (from appsettings.json, environment, etc.)
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile(
+        $"appsettings.{builder.Environment.EnvironmentName}.json",
+        optional: true,
+        reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Bind ConfigOptions from configuration
@@ -28,22 +31,15 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "House Measurements API V1");
     });
+    app.MapGet("/", async context =>
+    {
+        context.Response.Redirect("/swagger");
+        await Task.CompletedTask;
+    });
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
 app.MapCarter();
-
-// Example: show configuration values in a simple endpoint
-app.MapGet("/config", (IOptions<ConfigOptions> config) =>
-{
-    var c = config.Value;
-    return Results.Ok(new
-    {
-        Table = c.MyTableName,
-        Sensor = c.MySensorName,
-        ConnectionStringSet = !string.IsNullOrEmpty(c.MyTableStorageConnectionString)
-    });
-});
 
 app.Run();

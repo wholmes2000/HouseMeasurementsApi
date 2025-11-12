@@ -1,0 +1,16 @@
+{
+  "profiles": {
+    "HouseMeasurementsApi": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:7240;http://localhost:5240",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "MY_TABLE_STORAGE_CONNECTION_STRING": "UseDevelopmentStorage=true",
+        "MY_TABLE_NAME": "measurements",
+        "MY_SENSOR_NAME": "enviro-grow"
+      }
+    }
+  }
+}
