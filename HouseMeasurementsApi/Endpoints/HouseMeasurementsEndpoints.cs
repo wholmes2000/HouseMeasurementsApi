@@ -28,8 +28,8 @@ public class HouseMeasurementsEndpoints(ILogger<HouseMeasurementsEndpoints> logg
 
         try
         {
-            var connectionString = config.Value.MyTableStorageConnectionString;
-            var tableName = config.Value.MyTableName;
+            var connectionString = config.Value.TableStorageConnectionString;
+            var tableName = config.Value.TableName;
 
             if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(tableName))
             {
