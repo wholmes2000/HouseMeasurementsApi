@@ -20,6 +20,12 @@ public class HouseMeasurementsEndpoints(ILogger<HouseMeasurementsEndpoints> logg
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .Produces(StatusCodes.Status500InternalServerError);
+        
+        houseMeasurementsGroup.MapGet("/getData", GetData)
+            .WithName("getData")
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .Produces(StatusCodes.Status500InternalServerError);
     }
 
     private async Task<IResult> IngestData([FromBody] Measurement measurement)
@@ -35,12 +41,6 @@ public class HouseMeasurementsEndpoints(ILogger<HouseMeasurementsEndpoints> logg
             {
                 logger.LogWarning("HouseMeasurementsEndpoints IngestData Invalid table connection environment variables");
                 return Results.BadRequest("Invalid table connection environment variables.");
-            }
-
-            if (measurement is null)
-            {
-                logger.LogWarning("HouseMeasurementsEndpoints IngestData Request body is null");
-                return Results.BadRequest("Missing request body.");
             }
 
             if (string.IsNullOrWhiteSpace(measurement.Uid) ||
@@ -86,6 +86,83 @@ public class HouseMeasurementsEndpoints(ILogger<HouseMeasurementsEndpoints> logg
         finally
         {
             logger.LogDebug("HouseMeasurementsEndpoints IngestData Leave");
+        }
+    }
+
+    private async Task<GetMeasurementResponse> GetData(string? start, string? end)
+    {
+        logger.LogDebug("HouseMeasurementsEndpoints GetData Enter with start: {Start}, end: {End}", start, end);
+
+        try
+        {
+            var connectionString = config.Value.TableStorageConnectionString;
+            var tableName = config.Value.TableName;
+            var sensorName = config.Value.SensorName;
+
+            if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(tableName))
+            {
+                logger.LogWarning("HouseMeasurementsEndpoints GetData Invalid table connection environment variables");
+                return new GetMeasurementResponse
+                {
+                    Nickname = sensorName,
+                    Measurements = new List<MeasurementReading>()
+                };
+            }
+
+            if (!DateTime.TryParse(start, out DateTime startDate))
+            {
+                logger.LogWarning("HouseMeasurementsEndpoints GetData Invalid start date: {Start}", start);
+                startDate = DateTime.MinValue;
+            }
+
+            if (!DateTime.TryParse(end, out DateTime endDate))
+            {
+                logger.LogWarning("HouseMeasurementsEndpoints GetData Invalid end date: {End}", end);
+                endDate = DateTime.MaxValue;
+            }
+
+            var startRowKey = startDate.ToUniversalTime().ToString("o");
+            var endRowKey = endDate.ToUniversalTime().ToString("o");
+
+            var client = new TableClient(connectionString, tableName);
+            await client.CreateIfNotExistsAsync();
+            
+            var combinedFilter = TableClient.CreateQueryFilter(
+                $"PartitionKey eq {sensorName} and RowKey ge {startRowKey} and RowKey le {endRowKey}"
+            );
+
+            var measurements = new List<MeasurementReading>();
+
+            await foreach (var entity in client.QueryAsync<TableEntity>(filter: combinedFilter))
+            {
+                measurements.Add(new MeasurementReading
+                {
+                    RowKey = entity.RowKey,
+                    Temperature = entity.GetDouble("temperature") ?? 0,
+                    Humidity = entity.GetDouble("humidity") ?? 0,
+                    Pressure = entity.GetDouble("pressure") ?? 0
+                });
+            }
+
+
+            return new GetMeasurementResponse
+            {
+                Nickname = sensorName,
+                Measurements = measurements
+            };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "HouseMeasurementsEndpoints GetData Error: {Message}", ex.Message);
+            return new GetMeasurementResponse
+            {
+                Nickname = config.Value.SensorName,
+                Measurements = new List<MeasurementReading>()
+            };
+        }
+        finally
+        {
+            logger.LogDebug("HouseMeasurementsEndpoints GetData Leave");
         }
     }
 }

@@ -6,10 +6,7 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7240;http://localhost:5240",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "Config__TableStorageConnectionString": "UseDevelopmentStorage=true",
-        "Config__SensorName": "measurements",
-        "Config__TableName": "enviro-grow"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }
