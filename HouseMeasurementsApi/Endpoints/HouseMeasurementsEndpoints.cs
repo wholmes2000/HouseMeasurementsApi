@@ -4,6 +4,7 @@ using HouseMeasurementsApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Azure.Data.Tables;
+using HouseMeasurementsApi.Helpers;
 
 namespace HouseMeasurementsApi.Endpoints;
 
@@ -138,9 +139,9 @@ public class HouseMeasurementsEndpoints(ILogger<HouseMeasurementsEndpoints> logg
                 measurements.Add(new MeasurementReading
                 {
                     RowKey = entity.RowKey,
-                    Temperature = entity.GetDouble("temperature") ?? 0,
-                    Humidity = entity.GetDouble("humidity") ?? 0,
-                    Pressure = entity.GetDouble("pressure") ?? 0
+                    Temperature = HelperMethods.GetNumericValue(entity, "temperature"),
+                    Humidity = HelperMethods.GetNumericValue(entity,"humidity"),
+                    Pressure = HelperMethods.GetNumericValue(entity,"pressure")
                 });
             }
 
