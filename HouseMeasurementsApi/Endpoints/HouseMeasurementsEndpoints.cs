@@ -146,6 +146,28 @@ public class HouseMeasurementsEndpoints(ILogger<HouseMeasurementsEndpoints> logg
             }
 
 
+            // LTTB DOWNSAMPLING
+            if (measurements.Count > 500)
+            {
+                logger.LogInformation(
+                    "HouseMeasurementsEndpoints GetData Applying LTTB downsampling: {OriginalCount} → 500 points",
+                    measurements.Count
+                );
+
+                measurements = Lttb.Downsample(measurements, 500);
+            }
+            else
+            {
+                logger.LogDebug(
+                    "HouseMeasurementsEndpoints GetData Skipping downsampling, point count: {Count}",
+                    measurements.Count
+                );
+            }
+
+            measurements = measurements
+                .OrderBy(m => m.RowKey) // Ensure sorted after downsampling
+                .ToList();
+
             return new GetMeasurementResponse
             {
                 Nickname = sensorName,
